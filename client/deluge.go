@@ -182,6 +182,7 @@ func (c *Deluge) GetTorrents() (map[string]config.Torrent, error) {
 			// free space
 			FreeSpaceGB:  c.GetFreeSpace,
 			FreeSpaceSet: c.freeSpaceSet,
+			Count: 		  len(torrents) + 1,
 			// tracker
 			TrackerName:   t.TrackerHost,
 			TrackerStatus: t.TrackerStatus,

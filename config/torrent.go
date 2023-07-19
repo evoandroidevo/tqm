@@ -42,6 +42,7 @@ type Torrent struct {
 	// set by client on GetCurrentFreeSpace
 	FreeSpaceGB  func() float64 `json:"-"`
 	FreeSpaceSet bool           `json:"-"`
+	Count 		 int 			`json:"-"`
 
 	// tracker
 	TrackerName   string `json:"TrackerName"`
