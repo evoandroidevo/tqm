@@ -91,8 +91,12 @@ func getHashTorrentPairs(torrents map[string]config.Torrent) []HashTorrentPair {
 
 func sortTorrentsByAddedSeconds(torrents []HashTorrentPair) {
 	sort.Slice(torrents, func(i, j int) bool {
-		return torrents[i].Torrent.AddedSeconds < torrents[j].Torrent.AddedSeconds
+		return torrents[i].Torrent.AddedSeconds > torrents[j].Torrent.AddedSeconds
 	})
+}
+
+func updateTorrentCount(torrents []HashTorrentPair) {
+	for x := range torrents { torrents[x].Torrent.Count = len(torrents) - x }
 }
 
 func filterTorrents(hashTorrentPairs []HashTorrentPair, log *logrus.Entry, c client.Interface, torrents map[string]config.Torrent) ([]HashTorrentPair, int, int) {
@@ -163,8 +167,8 @@ func processRemoveTorrents(removeCount int, removeTorrents []HashTorrentPair, lo
 				humanize.IBytes(uint64(t.DownloadedBytes)), t.FreeSpaceGB())
 		}
 
-		log.Infof("Ratio: %.3f / Seed days: %.3f / Seeds: %d / Label: %s / Tracker: %s / "+
-			"Tracker Status: %q", t.Ratio, t.SeedingDays, t.Seeds, t.Label, t.TrackerName, t.TrackerStatus)
+		log.Infof("Ratio: %.3f / Seed days: %.3f / Seeds: %d / Label: %s / Tracker: %s / Count: %v /" +
+			"Tracker Status: %q", t.Ratio, t.SeedingDays, t.Seeds, t.Label, t.TrackerName, t.Count, t.TrackerStatus)
 
 		if !flagDryRun {
 			// do remove
@@ -221,6 +225,7 @@ func removeEligibleTorrents(log *logrus.Entry, c client.Interface, torrents map[
 
 	hashTorrentPairs := getHashTorrentPairs(torrents)
 	sortTorrentsByAddedSeconds(hashTorrentPairs)
+	updateTorrentCount(hashTorrentPairs)
 
 	//Filter out all torrents that can be removed
 	removeTorrents, ignoredTorrents, errorRemoveTorrents := filterTorrents(hashTorrentPairs, log, c, torrents)
